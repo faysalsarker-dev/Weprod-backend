@@ -35,11 +35,30 @@ async function run() {
 
     const productCollection = client.db('Weprod').collection('product')
 
-app.get('/product',async(req,res)=>{
-    const result = await productCollection.find().toArray()
-    console.log(result);
-    res.send(result)
-})
+    app.get('/product', async (req, res) => {
+      const page = parseInt(req.query.page) || 1; 
+      const search = req.query.search || "";
+      const limit = 5;
+      
+      const query = {};
+      if (search) {
+        query.productName = { $regex: search, $options: "i" };
+      }
+    
+      const skip = (page - 1) * limit;
+    
+      const result = await productCollection.find(query).sort({ date: -1 }).skip(skip).limit(limit).toArray();
+      const totalProducts = await productCollection.countDocuments(query);
+    
+      res.send({
+        data: result,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts
+      });
+    });
+    
+  
 
 
 
