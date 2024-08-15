@@ -35,21 +35,52 @@ async function run() {
 
     const productCollection = client.db('Weprod').collection('product')
 
+
+
+
     app.get('/product', async (req, res) => {
       const page = parseInt(req.query.page) || 1; 
       const search = req.query.search || "";
-      const limit = 5;
+      const sortValue = req.query.sort || "";
+      const brand = req.query.brand || "";
+      const category = req.query.category || "";
+      const minimum = parseFloat(req.query.minimum) || 0;
+      const maximum = parseFloat(req.query.maximum) || Number.MAX_VALUE;
+      const limit = 11;
       
       const query = {};
+      
       if (search) {
         query.productName = { $regex: search, $options: "i" };
       }
+      
+      if (brand) {
+        query.brand = { $regex: brand, $options: "i" } ;
+      }
+      
+      if (category) {
+        query.category = { $regex: category, $options: "i" } ;
+      }
+      
+      if (minimum && maximum) {
+        query.price = {
+          $gte: minimum,
+          $lte: maximum
+        };
+      }
+      
+      let sort = { createdAt: -1 }; 
+      if (sortValue === 'Low to High') {
+        sort.price = 1;
+      } else if (sortValue === 'High to Low') {
+        sort.price = -1;
+      }
     
       const skip = (page - 1) * limit;
-    
-      const result = await productCollection.find(query).sort({ date: -1 }).skip(skip).limit(limit).toArray();
+      
+      const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();
       const totalProducts = await productCollection.countDocuments(query);
-    
+      
       res.send({
         data: result,
         currentPage: page,
@@ -57,6 +88,7 @@ async function run() {
         totalProducts
       });
     });
+    
     
   
 
