@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(
   cors({
     origin: ["http://localhost:5173"],
-    // credentials: true,
+    
   })
 );
 app.use(express.json());
@@ -47,7 +47,7 @@ async function run() {
       const minimum = parseFloat(req.query.minimum) || 0;
       const maximum = parseFloat(req.query.maximum) || Number.MAX_VALUE;
       const limit = 11;
-      
+     
       const query = {};
       
       if (search) {
@@ -77,7 +77,7 @@ async function run() {
       }
     
       const skip = (page - 1) * limit;
-      
+      console.log(sort);
       const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();
       const totalProducts = await productCollection.countDocuments(query);
       
