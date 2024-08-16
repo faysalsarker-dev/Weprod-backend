@@ -38,8 +38,60 @@ async function run() {
 
 
 
+    // app.get('/product', async (req, res) => {
+    //   const page = parseInt(req.query.page) || 1; 
+    //   const search = req.query.search || "";
+    //   const sortValue = req.query.sort || "";
+    //   const brand = req.query.brand || "";
+    //   const category = req.query.category || "";
+    //   const minimum = parseFloat(req.query.minimum) || 0;
+    //   const maximum = parseFloat(req.query.maximum) || Number.MAX_VALUE;
+    //   const limit = 11;
+     
+    //   const query = {};
+      
+    //   if (search) {
+    //     query.productName = { $regex: search, $options: "i" };
+    //   }
+      
+    //   if (brand) {
+    //     query.brand = { $regex: brand, $options: "i" } ;
+    //   }
+      
+    //   if (category) {
+    //     query.category = { $regex: category, $options: "i" } ;
+    //   }
+      
+    //   if (minimum && maximum) {
+    //     query.price = {
+    //       $gte: minimum,
+    //       $lte: maximum
+    //     };
+    //   }
+      
+    //   let sort = { createdAt: -1 }; 
+    //   if (sortValue === 'Low to High') {
+    //     sort.price = 1;
+    //   } else if (sortValue === 'High to Low') {
+    //     sort.price = -1;
+    //   }
+    
+    //   const skip = (page - 1) * limit;
+    //   console.log(sort);
+    //   const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();
+    //   const totalProducts = await productCollection.countDocuments(query);
+      
+    //   res.send({
+    //     data: result,
+    //     currentPage: page,
+    //     totalPages: Math.ceil(totalProducts / limit),
+    //     totalProducts
+    //   });
+    // });
+    
+    
     app.get('/product', async (req, res) => {
-      const page = parseInt(req.query.page) || 1; 
+      const page = parseInt(req.query.page) || 1;
       const search = req.query.search || "";
       const sortValue = req.query.sort || "";
       const brand = req.query.brand || "";
@@ -47,40 +99,40 @@ async function run() {
       const minimum = parseFloat(req.query.minimum) || 0;
       const maximum = parseFloat(req.query.maximum) || Number.MAX_VALUE;
       const limit = 11;
-     
+    
       const query = {};
-      
+    
       if (search) {
         query.productName = { $regex: search, $options: "i" };
       }
-      
+    
       if (brand) {
-        query.brand = { $regex: brand, $options: "i" } ;
+        query.brand = { $regex: brand, $options: "i" };
       }
-      
+    
       if (category) {
-        query.category = { $regex: category, $options: "i" } ;
+        query.category = { $regex: category, $options: "i" };
       }
-      
-      if (minimum && maximum) {
+    
+      // Adjusted to properly check for minimum and maximum values
+      if (!isNaN(minimum) || !isNaN(maximum)) {
         query.price = {
           $gte: minimum,
           $lte: maximum
         };
       }
-      
+    
       let sort = { createdAt: -1 }; 
       if (sortValue === 'Low to High') {
-        sort.price = 1;
+        sort = { price: 1, createdAt: -1 };
       } else if (sortValue === 'High to Low') {
-        sort.price = -1;
+        sort = { price: -1, createdAt: -1 };
       }
     
       const skip = (page - 1) * limit;
-      console.log(sort);
       const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();
       const totalProducts = await productCollection.countDocuments(query);
-      
+    
       res.send({
         data: result,
         currentPage: page,
@@ -89,8 +141,6 @@ async function run() {
       });
     });
     
-    
-  
 
 
 
