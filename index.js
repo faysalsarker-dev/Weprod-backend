@@ -8,14 +8,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(
-  cors({
-    origin: ["http://localhost:5173","https://weprod-87efb.web.app"],
-    
-  })
-);
 app.use(express.json());
-
+app.use(cors());
 
 
 
@@ -71,9 +65,11 @@ async function run() {
     
       let sort = { createdAt: -1 }; 
       if (sortValue === 'Low to High') {
-        sort = { price: 1, createdAt: -1 };
+        sort = { price: 1 };
       } else if (sortValue === 'High to Low') {
-        sort = { price: -1, createdAt: -1 };
+        sort = { price: -1 };
+      } else if(sortValue === 'Newest first'){
+        sort = {  createdAt: -1 };
       }
     
      
