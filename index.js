@@ -31,7 +31,7 @@ async function run() {
 
 
 
-    
+   // all product route 
     app.get('/product', async (req, res) => {
       const page = parseInt(req.query.page) || 1;
       const search = req.query.search || "";
@@ -40,14 +40,18 @@ async function run() {
       const category = req.query.category || "";
       const minimum = parseFloat(req.query.minimum) || 0;
       const maximum = parseFloat(req.query.maximum) || Number.MAX_VALUE;
+
+      // limit for page
       const limit = 11;
     
+
+      // query for finding product 
       const query = {};
     
+      // check query value with condition
       if (search) {
         query.productName = { $regex: search, $options: "i" };
       }
-    
       if (brand) {
         query.brand = { $regex: brand, $options: "i" };
       }
@@ -63,7 +67,11 @@ async function run() {
         };
       }
     
+      // sorting value
       let sort = { createdAt: -1 }; 
+
+
+      // check sorting value with condition
       if (sortValue === 'Low to High') {
         sort = { price: 1 };
       } else if (sortValue === 'High to Low') {
@@ -72,9 +80,11 @@ async function run() {
         sort = {  createdAt: -1 };
       }
     
-     
+     // make variable for skip 
       const skip = (page - 1) * limit;
-      const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();
+      const result = await productCollection.find(query).sort(sort).skip(skip).limit(limit).toArray();\
+
+      // total Product lenght for pagination
       const totalProducts = await productCollection.countDocuments(query);
     
       res.send({
